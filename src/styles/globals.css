@@ -1,0 +1,35 @@
+/* stylelint-disable at-rule-no-unknown */
+@import "tailwindcss";
+/* stylelint-enable at-rule-no-unknown */
+
+@layer base {
+  body {
+    @apply bg-slate-100 text-slate-700 antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white border border-slate-200 rounded-2xl shadow-sm;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition;
+    @apply focus:ring-2 focus:ring-sky-500 focus:border-transparent;
+  }
+
+  .button-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl;
+    @apply bg-sky-600 hover:bg-sky-700;
+    @apply text-white font-medium px-5 py-3;
+    @apply transition-all duration-200;
+  }
+
+  .table-header {
+    @apply text-left text-xs uppercase tracking-wider text-slate-500;
+  }
+
+  .table-cell {
+    @apply px-6 py-4;
+  }
+}
