@@ -11,21 +11,45 @@ import api, { initCsrf } from './axios';
  */
 export const login = async (email, password) => {
   // Ambil CSRF cookie dulu (wajib untuk Sanctum)
-  await initCsrf();
-
-  const response = await api.post('/api/login', { email, password });
-
-  // Jika API mengembalikan token (token-based), simpan
-  if (response.data?.token) {
-    localStorage.setItem('auth_token', response.data.token);
+  try {
+    await initCsrf();
+  } catch (err) {
+    // Jika backend tidak tersedia (dev), biarkan terus — kita pakai fake login below
+    console.warn('initCsrf gagal, lanjutkan (dev mode):', err?.message || err);
   }
 
-  // Simpan data user
-  if (response.data?.user) {
-    localStorage.setItem('user', JSON.stringify(response.data.user));
+  // Jika ingin menggunakan API nyata, uncomment baris berikut:
+  // const response = await api.post('/api/admin/login', { email, password });
+
+  // Fake login (development)
+  if (email === 'admin@gmail.com' && password === '123456') {
+    const response = {
+      data: {
+        user: {
+          id: 1,
+          name: 'Admin',
+          email: 'admin@gmail.com',
+          role: 'admin',
+        },
+        token: 'fake-jwt-token-for-admin',
+      },
+    };
+
+    // Persist untuk sesi lokal supaya isAuthenticated() dan reload bekerja
+    if (response.data?.token) {
+      localStorage.setItem('auth_token', response.data.token);
+    }
+
+    if (response.data?.user) {
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+
+    return response.data;
   }
 
-  return response.data;
+  // Jika menggunakan API nyata, kembalikan hasil request di sini.
+  // Jika tidak cocok kredensial fake, lempar error.
+  throw new Error('Gagal login. Periksa kredensial.');
 };
 
 /**

@@ -8,44 +8,44 @@ import api from './axios';
  * @param {object} params - Query params (tanggal, karyawan_id, dll)
  */
 export const getAbsensi = (params = {}) =>
-  api.get('/api/absensi', { params });
+  api.get('/api/attendance/today', { params });
 
 /**
  * Ambil absensi berdasarkan ID
  */
 export const getAbsensiById = (id) =>
-  api.get(`/api/absensi/${id}`);
+  api.get(`/api/attendance/${id}`);
 
 /**
  * Absensi masuk
  */
 export const absenMasuk = (data) =>
-  api.post('/api/absensi/masuk', data);
+  api.post('/api/clock-in', data);
 
 /**
  * Absensi keluar
  */
 export const absenKeluar = (data) =>
-  api.post('/api/absensi/keluar', data);
+  api.post('/api/clock-out', data);
 
 /**
  * Update data absensi (admin only)
  */
 export const updateAbsensi = (id, data) =>
-  api.put(`/api/absensi/${id}`, data);
+  api.put(`/api/attendance/${id}`, data);
 
 /**
  * Hapus data absensi (admin only)
  */
 export const deleteAbsensi = (id) =>
-  api.delete(`/api/absensi/${id}`);
+  api.delete(`/api/attendance/${id}`);
 
 /**
  * Export laporan absensi
  * @param {object} params - { bulan, tahun, format: 'xlsx'|'pdf' }
  */
 export const exportAbsensi = (params = {}) =>
-  api.get('/api/absensi/export', {
+  api.get('/api/attendance/export', {
     params,
     responseType: 'blob', // Penting untuk download file
   });
@@ -54,4 +54,4 @@ export const exportAbsensi = (params = {}) =>
  * Ambil rekapitulasi absensi
  */
 export const getRekapAbsensi = (params = {}) =>
-  api.get('/api/absensi/rekap', { params });
+  api.get('/api/attendance/recap', { params });
