@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https:api.lautanrejeki.id'; // Sesuaikan dengan hosting/local API kamu
+const API_BASE_URL = 'http://api.lautanrejeki.id'; // Sesuaikan dengan hosting/local API kamu
 
 export const absensiService = {
   // Mengambil semua data absensi
   getAllAbsensi: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/absensi`);
+      const response = await axios.get(`${API_BASE_URL}/api/history`);
       return response.data;
     } catch (error) {
       console.error("Gagal memuat data absensi:", error);
