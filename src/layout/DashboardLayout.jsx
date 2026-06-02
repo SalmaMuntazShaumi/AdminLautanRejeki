@@ -14,13 +14,13 @@ export default function DashboardLayout({ children }) {
         />
       )}
 
-      <div className="lg:flex">
+      <div className="lg:flex lg:h-screen lg:oferflow-hidden">
         <Sidebar
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
 
-        <div className="lg:flex-1">
+        <div className="lg:flex-1 flex flex-col">
           <Topbar onOpenSidebar={() => setSidebarOpen(true)} />
 
           <main className="p-6 lg:p-8">{children}</main>

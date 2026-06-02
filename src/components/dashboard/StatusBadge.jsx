@@ -2,7 +2,13 @@ export default function StatusBadge({
   status
 }) {
   const isOnTime =
-    status === 'Tepat Waktu';
+    status === 'on_time';
+
+  const displayStatus = isOnTime
+    ? 'on_time'
+    : status === 'late'
+      ? 'late'
+      : status; // fallback jika ada status lain
 
   return (
     <span

@@ -4,16 +4,17 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://api.lautanrejeki.id',
-  withCredentials: true,       // Penting untuk Sanctum cookie-based auth
-  withXSRFToken: true,         // Otomatis kirim XSRF-TOKEN header
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    'https://api.lautanrejeki.id',
+
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
+    Accept: 'application/json',
   },
-  timeout: 15000, // 15 detik timeout
-});
+  withCredentials: true, // Penting untuk cookie-based auth
+  timeout: 15000,
+})
 
 // ────────────────────────────────────────────────
 // Request Interceptor
@@ -39,10 +40,10 @@ api.interceptors.response.use(
     const status = error.response?.status;
 
     if (status === 401) {
-      // Session expired / tidak terautentikasi → redirect ke login
+      // Session expired / tidak terautentikasi.
+      // Jangan langsung redirect dari interceptor, karena React auth state harus mengontrol navigasi.
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
     }
 
     if (status === 403) {
@@ -62,9 +63,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// Helper: Inisialisasi CSRF cookie (wajib dipanggil sebelum login)
-export const initCsrf = () =>
-  api.get('/sanctum/csrf-cookie');
 
 export default api;

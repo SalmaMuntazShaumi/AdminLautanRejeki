@@ -6,6 +6,8 @@ import ReportsPage from '../pages/Reports';
 // import CalendarPage from '../pages/Calendar';
 import NotFound from '../pages/NotFound';
 import { useAuth } from '../contexts/AuthContext';
+import RegisterPage from '../pages/Auth/Register';
+import TimeOff from '../pages/TimeOff';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -25,6 +27,8 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
+      <Route path="/register" element={<RegisterPage />} />
+
       <Route
         path="/"
         element={
@@ -37,6 +41,11 @@ export default function App() {
       <Route
         path="/karyawan"
         element={<RequireAuth><KaryawanPage /></RequireAuth>}
+      />
+
+      <Route
+        path="/request-time-off"
+        element={<RequireAuth><TimeOff/></RequireAuth>}
       />
 
       <Route

@@ -11,15 +11,15 @@ export default function AttendanceRow({
       </td>
 
       <td className="px-6 py-4">
-        {item.tanggal}
+        {item.date}
       </td>
 
       <td className="px-6 py-4">
-        {item.jamMasuk || '-'}
+        {item.clock_in || '-'}
       </td>
 
       <td className="px-6 py-4">
-        {item.jamKeluar || '-'}
+        {item.clock_out || '-'}
       </td>
 
       <td className="px-6 py-4">

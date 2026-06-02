@@ -1,5 +1,4 @@
-import AttendanceTable from '../../components/dashboard/AttendanceTable';
-import ReportSection from '../../components/dashboard/ReportSection';
+import AttendanceChart from '../../components/charts/AttendanceChart';
 import StatsGrid from '../../components/dashboard/StatsGrid';
 import DashboardLayout from '../../layout/DashboardLayout';
 import { useAttendance } from '../../hooks/useAttendance';
@@ -7,28 +6,22 @@ import { useAttendance } from '../../hooks/useAttendance';
 export default function DashboardPage() {
   const {
     loading,
-    filteredData,
+    data,
     statistics,
-    searchQuery,
-    setSearchQuery,
-    exportExcel
+    exportExcel,
+    handleFilterDate,
   } = useAttendance();
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-
         <StatsGrid statistics={statistics} />
-
-        <ReportSection onExport={exportExcel} />
-
-        <AttendanceTable
-          data={filteredData}
+        <AttendanceChart
+          data={data}
           loading={loading}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
+          onFilterDate={handleFilterDate}
+          onExport={exportExcel}
         />
-
       </div>
     </DashboardLayout>
   );

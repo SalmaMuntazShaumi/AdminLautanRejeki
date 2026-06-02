@@ -1,8 +1,12 @@
-// File: src/contexts/AuthContext.jsx
-// Context untuk state autentikasi di seluruh aplikasi
-
 import { createContext, useContext, useState, useEffect } from 'react';
-import { login as loginApi, logout as logoutApi, getUser, isAuthenticated, getStoredUser } from '../api/auth';
+import { 
+  login as loginApi, 
+  logout as logoutApi, 
+  getUser, 
+  isAuthenticated, 
+  getStoredUser, 
+  requestOtp as requestOtpApi  // ✅ rename import
+} from '../api/auth';
 
 const AuthContext = createContext(null);
 
@@ -10,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getStoredUser());
   const [loading, setLoading] = useState(true);
 
-  // Cek session saat pertama kali load
   useEffect(() => {
     const checkAuth = async () => {
       if (isAuthenticated()) {
@@ -18,16 +21,19 @@ export const AuthProvider = ({ children }) => {
           const data = await getUser();
           setUser(data);
           localStorage.setItem('user', JSON.stringify(data));
-        } catch {
-          // Token invalid / expired
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('user');
-          setUser(null);
+        } catch (err) {
+          const status = err.response?.status;
+          if (status === 401 || status === 419 || status === 403) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            setUser(null);
+          } else {
+            console.warn('Auth check warning:', err);
+          }
         }
       }
       setLoading(false);
     };
-
     checkAuth();
   }, []);
 
@@ -35,6 +41,22 @@ export const AuthProvider = ({ children }) => {
     const data = await loginApi(email, password);
     const userData = data.user || data;
     setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    return userData;
+  };
+
+  // ✅ Fix: requestOtp tidak set user, hanya kirim OTP
+  const requestOtp = async (phone) => {
+    const data = await requestOtpApi(phone);
+    return data;
+  };
+
+  // ✅ Tambah: set user setelah verify OTP berhasil
+  const loginWithOtp = async (phone, otp) => {
+    const response = await import('../api/auth').then(m => m.loginWithOtp(phone, otp));
+    const userData = response.user || response;
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
     return userData;
   };
 
@@ -44,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, loading, login, requestOtp, loginWithOtp, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,7 +4,9 @@
 import api from './axios';
 
 export const getKaryawan = (params = {}) =>
-  api.get('/api/karyawan', { params });
+  api
+    .get('/api/users', { params })
+    .then((response) => response.data?.data ?? response.data ?? []);
 
 export const getKaryawanById = (id) =>
   api.get(`/api/karyawan/${id}`);

@@ -14,12 +14,12 @@ export default defineConfig({
     // Semua request ke /api dan /sanctum diarahkan ke BE lokal
     proxy: {
       '/api': {
-        target: 'http://localhost:8000', // Alamat BE Laravel saat dev lokal
+        target: 'https://api.lautanrejeki.id', // Alamat BE Laravel saat dev lokal
         changeOrigin: true,
         secure: false,
       },
       '/sanctum': {
-        target: 'http://localhost:8000',
+        target: 'https://api.lautanrejeki.id', // Alamat BE Laravel saat dev lokal
         changeOrigin: true,
         secure: false,
       },
