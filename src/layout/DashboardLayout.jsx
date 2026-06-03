@@ -6,7 +6,7 @@ export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100" className="lg:ml-72">
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-slate-900/40 lg:hidden"
