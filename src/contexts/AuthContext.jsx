@@ -5,7 +5,7 @@ import {
   getUser, 
   isAuthenticated, 
   getStoredUser, 
-  requestOtp as requestOtpApi  // ✅ rename import
+  requestOtp as requestOtpApi
 } from '../api/auth';
 
 const AuthContext = createContext(null);
