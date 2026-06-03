@@ -27,11 +27,12 @@ export function exportAttendanceExcel(data, payload) {
   }
 
   const rows = filtered.map((item) => ({
-    Nama:         item.nama      ?? '-',
-    Tanggal:      item.date      ?? '-',
-    'Jam Masuk':  item.clock_in  ?? '-',
+    Nama: item.nama ?? '-',
+    Tanggal: item.date ?? '-',
+    'Jam Masuk': item.clock_in ?? '-',
     'Jam Keluar': item.clock_out ?? '-',
-    Status:       item.status    ?? '-',
+    Status: item.status ?? '-',
+    reason: item.early_out_reason ?? '-',
   }));
 
   if (rows.length === 0) {
@@ -41,6 +42,6 @@ export function exportAttendanceExcel(data, payload) {
 
   const worksheet = XLSX.utils.json_to_sheet(rows);
   const workbook  = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Absensi');
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Absensi')  ;
   XLSX.writeFile(workbook, `Absensi-${reportType}-${Date.now()}.xlsx`);
 }
