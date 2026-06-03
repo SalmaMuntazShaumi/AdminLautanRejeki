@@ -1,27 +1,31 @@
 import * as XLSX from 'xlsx';
+import { getWeekRange } from './week_helper';
 
 export function exportAttendanceExcel(data, payload) {
-  const { reportType, selectedDate, selectedMonth, selectedYear } = payload;
-
+  const { reportType, selectedDate, selectedMonth, selectedYear, selectedWeek } = payload;
   let filtered = [];
 
   if (reportType === 'daily') {
-    filtered = data.filter(
-      (item) => item.date === selectedDate
-    );
-  }
-  if (reportType === 'monthly') {
-    filtered = data.filter(
-      (item) => item.date?.startsWith(selectedMonth) // ← ?. agar tidak crash jika undefined
-    );
-  }
-  if (reportType === 'yearly') {
-    filtered = data.filter(
-      (item) => item.date?.startsWith(selectedYear)
-    );
+    filtered = data.filter((item) => item.date === selectedDate);
   }
 
-  // Rapikan kolom sebelum export
+  if (reportType === 'weekly' && selectedWeek) {
+    const { start, end } = getWeekRange(selectedWeek);
+    filtered = data.filter((item) => {
+      if (!item.date) return false;
+      const d = new Date(item.date);
+      return d >= start && d <= end;
+    });
+  }
+
+  if (reportType === 'monthly') {
+    filtered = data.filter((item) => item.date?.startsWith(selectedMonth));
+  }
+
+  if (reportType === 'yearly') {
+    filtered = data.filter((item) => item.date?.startsWith(selectedYear));
+  }
+
   const rows = filtered.map((item) => ({
     Nama:         item.nama      ?? '-',
     Tanggal:      item.date      ?? '-',

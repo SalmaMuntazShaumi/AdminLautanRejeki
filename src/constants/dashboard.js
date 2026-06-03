@@ -6,6 +6,10 @@ export const REPORT_TYPES = [
     value: 'daily'
   },
   {
+    label: 'Mingguan',
+    value: 'weekly'
+  },
+  {
     label: 'Bulanan',
     value: 'monthly'
   },

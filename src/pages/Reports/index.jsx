@@ -38,6 +38,7 @@ export default function ReportsPage() {
                     handleFilter({ reportType: e.target.value, selectedDate, selectedMonth, selectedYear });
                   }} className="input">
                   <option value="daily">Harian</option>
+                  <option value="weekly">Mingguan</option>
                   <option value="monthly">Bulanan</option>
                   <option value="yearly">Tahunan</option>
                 </select>
@@ -51,6 +52,14 @@ export default function ReportsPage() {
                     className="input" />
                 </div>
               )}
+              {reportType === 'weekly' && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Minggu</label>
+                    <input type="week" value={selectedDate.slice(0, 8) + 'W' + getWeekNumber(new Date(selectedDate))}
+                      onChange={(e) => { setSelectedDate(e.target.value.replace('W', '-W') + '-1'); handleFilter({ reportType, selectedDate: e.target.value.replace('W', '-W') + '-1', selectedMonth, selectedYear }); }}
+                      className="input" />
+                  </div>
+                )}
               {reportType === 'monthly' && (
                 <div>
                   <label className="block text-sm font-medium mb-2">Bulan</label>

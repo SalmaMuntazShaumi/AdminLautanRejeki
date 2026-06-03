@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Download, Calendar } from 'lucide-react';
+import { getWeekNumber } from '../../utils/week_helper';
+
 
 export default function ReportFilter({ onExport, onFilterDate }) {
   const [reportType, setReportType] = useState('daily');
@@ -8,13 +10,18 @@ export default function ReportFilter({ onExport, onFilterDate }) {
   );
   const [selectedMonth, setSelectedMonth] = useState('2026-05');
   const [selectedYear, setSelectedYear]   = useState('2026');
+  const [selectedWeek, setSelectedWeek] = useState(() => {
+    const now = new Date();
+    const week = getWeekNumber(now);
+    return `${now.getFullYear()}-W${week}`;
+  });
 
   function handleExport() {
-    onExport({ reportType, selectedDate, selectedMonth, selectedYear });
+    onExport({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
   }
 
   function handleFilterDate() {
-    onFilterDate({ reportType, selectedDate, selectedMonth, selectedYear });
+    onFilterDate({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
   }
 
   return (
@@ -23,6 +30,7 @@ export default function ReportFilter({ onExport, onFilterDate }) {
         <label className="block text-sm font-medium mb-2">Jenis Laporan</label>
         <select value={reportType} onChange={(e) => setReportType(e.target.value)} className="input">
           <option value="daily">Harian</option>
+          <option value="weekly">Mingguan</option>
           <option value="monthly">Bulanan</option>
           <option value="yearly">Tahunan</option>
         </select>
@@ -33,6 +41,16 @@ export default function ReportFilter({ onExport, onFilterDate }) {
           <label className="block text-sm font-medium mb-2">Tanggal</label>
           <input type="date" value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)} className="input" />
+        </div>
+      )}
+      {reportType === 'weekly' && (
+        <div>
+          <label className="block text-sm font-medium mb-2">Minggu</label>
+          <input
+            type="week"
+            value={selectedWeek}
+            onChange={(e) => setSelectedWeek(e.target.value)}
+            className="input"/>
         </div>
       )}
       {reportType === 'monthly' && (

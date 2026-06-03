@@ -10,8 +10,16 @@ export function useAttendance() {
   const [filterParams, setFilterParams] = useState({
     reportType:    'daily',
     selectedDate:  new Date().toISOString().split('T')[0],
-    selectedMonth: '2026-05',
-    selectedYear:  '2026',
+    selectedMonth: new Date().toISOString().slice(0, 7),
+    selectedYear:  String(new Date().getFullYear()),
+    selectedWeek:  (() => {
+      const now  = new Date();
+      const d    = new Date(now); d.setHours(0,0,0,0);
+      d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+      const y    = new Date(d.getFullYear(), 0, 1);
+      const week = String(Math.ceil((((d - y) / 86400000) + 1) / 7)).padStart(2, '0');
+      return `${now.getFullYear()}-W${week}`;
+    })(),
   });
 
   useEffect(() => {

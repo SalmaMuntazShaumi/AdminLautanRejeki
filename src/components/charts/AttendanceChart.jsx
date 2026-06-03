@@ -6,6 +6,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { Download } from 'lucide-react';
+import { getWeekNumber } from '../../utils/week_helper';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -18,10 +19,15 @@ export default function AttendanceChart({ data, loading, onFilterDate, onExport 
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedYear, setSelectedYear]   = useState(String(new Date().getFullYear()));
   const hasMounted = useRef(false);
+  const [selectedWeek, setSelectedWeek] = useState(() => {
+    const now = new Date();
+    const week = getWeekNumber(now);
+    return `${now.getFullYear()}-W${week}`;
+  });
 
   useEffect(() => {
     if (!hasMounted.current) { hasMounted.current = true; return; }
-    onFilterDate({ reportType, selectedDate, selectedMonth, selectedYear });
+    onFilterDate({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
   }, [reportType, selectedDate, selectedMonth, selectedYear]);
 
   const chartData = buildChartData(data, reportType);
@@ -63,7 +69,7 @@ export default function AttendanceChart({ data, loading, onFilterDate, onExport 
   };
 
   function handleExport() {
-    onExport({ reportType, selectedDate, selectedMonth, selectedYear });
+    onExport({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
   }
 
   return (
@@ -85,6 +91,7 @@ export default function AttendanceChart({ data, loading, onFilterDate, onExport 
           <label className="block text-sm font-medium mb-2">Jenis Laporan</label>
           <select value={reportType} onChange={(e) => setReportType(e.target.value)} className="input">
             <option value="daily">Harian</option>
+            <option value="weekly">Mingguan</option>
             <option value="monthly">Bulanan</option>
             <option value="yearly">Tahunan</option>
           </select>
@@ -95,6 +102,17 @@ export default function AttendanceChart({ data, loading, onFilterDate, onExport 
             <label className="block text-sm font-medium mb-2">Tanggal</label>
             <input type="date" value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)} className="input" />
+          </div>
+        )}
+        {reportType === 'weekly' && (
+          <div>
+            <label className="block text-sm font-medium mb-2">Minggu</label>
+            <input
+              type="week"
+              value={selectedWeek}
+              onChange={(e) => setSelectedWeek(e.target.value)}
+              className="input"
+            />
           </div>
         )}
         {reportType === 'monthly' && (
@@ -142,6 +160,20 @@ function buildChartData(data, reportType) {
 
   if (reportType === 'daily') {
     return [{ label: 'Hari Ini', ...countByStatus(data) }];
+  }
+
+  if (reportType === 'weekly') {
+    const grouped = {};
+    data.forEach((item) => {
+      const day = item.date?.slice(0, 10);
+      if (!day) return;
+      if (!grouped[day]) grouped[day] = [];
+      grouped[day].push(item);
+    });
+    
+    return Object.entries(grouped)
+      .sort(([a], [b]) => new Date(a) - new Date(b))
+      .map(([day, items]) => ({ label: day.slice(5), ...countByStatus(items) }));
   }
 
   if (reportType === 'monthly') {

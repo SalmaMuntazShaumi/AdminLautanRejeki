@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AttendanceRow from './AttendanceRow';
 import LoadingSkeleton from '../ui/LoadingSkeleton';
 import EmptyState from '../ui/EmptyState';
+import { getWeekNumber } from '../../utils/week_helper';
 
 const PREVIEW_LIMIT = 5;
 
@@ -27,17 +28,22 @@ export default function AttendanceTable({
     String(new Date().getFullYear())
   );
   const hasMounted = useRef(false);
+  const [selectedWeek, setSelectedWeek] = useState(() => {
+    const now = new Date();
+    const week = getWeekNumber(now);
+    return `${now.getFullYear()}-W${week}`;
+  });
 
   useEffect(() => {
     if (!hasMounted.current) {
       hasMounted.current = true;
       return;
     }
-    onFilterDate({ reportType, selectedDate, selectedMonth, selectedYear });
+    onFilterDate({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
   }, [reportType, selectedDate, selectedMonth, selectedYear]);
 
   function handleExport() {
-    onExport({ reportType, selectedDate, selectedMonth, selectedYear });
+    onExport({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
   }
 
   const previewData = data.slice(0, PREVIEW_LIMIT);
@@ -69,6 +75,7 @@ export default function AttendanceTable({
             <label className="block text-sm font-medium mb-2">Jenis Laporan</label>
             <select value={reportType} onChange={(e) => setReportType(e.target.value)} className="input">
               <option value="daily">Harian</option>
+              <option value="weekly">Mingguan</option>
               <option value="monthly">Bulanan</option>
               <option value="yearly">Tahunan</option>
             </select>
@@ -79,6 +86,17 @@ export default function AttendanceTable({
               <label className="block text-sm font-medium mb-2">Tanggal</label>
               <input type="date" value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)} className="input" />
+            </div>
+          )}
+          {reportType === 'weekly' && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Minggu</label>
+              <input
+                type="week"
+                value={selectedWeek}
+                onChange={(e) => setSelectedWeek(e.target.value)}
+                className="input"
+              />
             </div>
           )}
           {reportType === 'monthly' && (

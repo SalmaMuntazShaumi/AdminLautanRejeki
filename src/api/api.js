@@ -1,4 +1,5 @@
 import api from './axios';
+import { getWeekRange } from '../utils/week_helper';
 
 export const absensiService = {
   getAllAbsensi: async (params = {}) => {
@@ -7,12 +8,16 @@ export const absensiService = {
 
       if (params.reportType === 'daily' && params.selectedDate) {
         queryParams.date = params.selectedDate;
+      } else if (params.reportType === 'weekly' && params.selectedWeek) {
+        // Kirim start & end date ke backend
+        const { start, end } = getWeekRange(params.selectedWeek);
+        queryParams.start_date = start.toISOString().split('T')[0];
+        queryParams.end_date   = end.toISOString().split('T')[0];
       } else if (params.reportType === 'monthly' && params.selectedMonth) {
-        queryParams.month = params.selectedMonth; // format: 2026-05
+        queryParams.month = params.selectedMonth;
       } else if (params.reportType === 'yearly' && params.selectedYear) {
         queryParams.year = params.selectedYear;
       } else {
-        // Default: hari ini
         queryParams.date = new Date().toISOString().split('T')[0];
       }
 
