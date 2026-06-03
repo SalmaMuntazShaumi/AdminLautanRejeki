@@ -62,12 +62,11 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <aside
-      className={`w-72 h-screen transform bg-slate-900 text-white flex flex-col p-6 transition-transform duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 w-72 h-screen overflow-y-auto transform bg-slate-900 text-white flex flex-col p-6 transition-transform duration-300 ease-in-out z-40 ${
         isOpen
           ? 'translate-x-0'
           : '-translate-x-full'
-      } lg:translate-x-0`}
-    >
+      } lg:translate-x-0`}>
 
       {/* HEADER */}
       <div className="flex items-center justify-between gap-4 mb-10">
