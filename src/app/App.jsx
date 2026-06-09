@@ -8,6 +8,7 @@ import NotFound from '../pages/NotFound';
 import { useAuth } from '../contexts/AuthContext';
 import RegisterPage from '../pages/Auth/Register';
 import TimeOff from '../pages/TimeOff';
+import TrackDrivers from '../pages/Trackers';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -46,6 +47,11 @@ export default function App() {
       <Route
         path="/request-time-off"
         element={<RequireAuth><TimeOff/></RequireAuth>}
+      />
+
+      <Route
+        path="/track-drivers"
+        element={<RequireAuth><TrackDrivers/></RequireAuth>}
       />
 
       <Route

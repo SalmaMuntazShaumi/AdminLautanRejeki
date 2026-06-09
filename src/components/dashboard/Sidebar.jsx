@@ -6,6 +6,7 @@ import {
   FileSpreadsheet,
   Users,
   X,
+  Car,
 } from 'lucide-react'
 
 import { NavLink } from 'react-router-dom'
@@ -21,6 +22,11 @@ const menus = [
     label: 'Request Time Off',
     icon: FileSpreadsheet,
     to: '/request-time-off',
+  },
+  {
+    label: 'Track Drivers',
+    icon: Car,
+    to: '/track-drivers',
   },
   {
     label: 'Workers',

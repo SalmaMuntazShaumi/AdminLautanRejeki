@@ -37,9 +37,18 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, role) => {
     const data = await loginApi(email, password);
     const userData = data.user || data;
+
+    // ✅ Cek role
+    if (userData.role?.toLowerCase() !== 'admin') {
+      // Hapus token yang sudah tersimpan
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      throw new Error('Akses ditolak. Hanya admin yang dapat login.');
+    }
+
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     return userData;
