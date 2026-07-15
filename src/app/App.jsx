@@ -40,6 +40,11 @@ export default function App() {
       />
 
       <Route
+        path="/reports"
+        element={<RequireAuth><ReportsPage /></RequireAuth>}
+      />
+
+      <Route
         path="/karyawan"
         element={<RequireAuth><KaryawanPage /></RequireAuth>}
       />

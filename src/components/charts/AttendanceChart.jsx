@@ -80,9 +80,6 @@ export default function AttendanceChart({ data, loading, onFilterDate, onExport 
           <h2 className="text-xl font-bold text-slate-800">Grafik Kehadiran</h2>
           <p className="text-sm text-slate-500 mt-1">Ringkasan data absensi karyawan</p>
         </div>
-        <button onClick={handleExport} className="button-primary flex items-center gap-2 self-start">
-          <Download size={18} /> Export Excel
-        </button>
       </div>
 
       {/* Filter */}

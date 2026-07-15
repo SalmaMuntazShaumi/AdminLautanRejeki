@@ -40,7 +40,7 @@ export default function AttendanceTable({
       return;
     }
     onFilterDate({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
-  }, [reportType, selectedDate, selectedMonth, selectedYear]);
+  }, [reportType, selectedDate, selectedMonth, selectedYear, selectedWeek]);
 
   function handleExport() {
     onExport({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
@@ -73,7 +73,9 @@ export default function AttendanceTable({
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-end">
           <div>
             <label className="block text-sm font-medium mb-2">Jenis Laporan</label>
-            <select value={reportType} onChange={(e) => setReportType(e.target.value)} className="input">
+            <select value={reportType} onChange={(e) => {
+                setReportType(e.target.value);
+              }} className="input">
               <option value="daily">Harian</option>
               <option value="weekly">Mingguan</option>
               <option value="monthly">Bulanan</option>

@@ -7,6 +7,7 @@ import {
   Users,
   X,
   Car,
+  Clock,
 } from 'lucide-react'
 
 import { NavLink } from 'react-router-dom'
@@ -17,6 +18,11 @@ const menus = [
     label: 'Dashboard',
     icon: LayoutDashboard,
     to: '/',
+  },
+  {
+    label: 'Reports',
+    icon: Clock,
+    to: '/reports',
   },
   {
     label: 'Request Time Off',
