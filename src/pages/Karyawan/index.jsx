@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import DashboardLayout from '../../layout/DashboardLayout'
 import { getKaryawan } from '../../api/karyawan'
-import { ChevronLeft, ChevronRight, ChevronsUpDown } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const PAGE_SIZE = 10
 
@@ -78,15 +78,6 @@ export default function KaryawanPage() {
   const totalPages  = Math.max(1, Math.ceil(processed.length / PAGE_SIZE))
   const paged       = processed.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  function SortIcon({ colKey }) {
-    if (sortKey !== colKey) return <ChevronsUpDown size={14} className="inline ml-1 text-slate-300" />
-    return (
-      <span className="inline ml-1 text-sky-500 text-xs">
-        {sortDir === 'asc' ? '↑' : '↓'}
-      </span>
-    )
-  }
-
   const thClass = "py-3 px-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide cursor-pointer select-none hover:text-slate-700"
 
   return (
@@ -140,19 +131,19 @@ export default function KaryawanPage() {
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
                     <th className={thClass} onClick={() => toggleSort('name')}>
-                      Nama <SortIcon colKey="name" />
+                      Nama {sortKey === 'name' && <span className="inline ml-1 text-sky-500 text-xs">{sortDir === 'asc' ? '↑' : '↓'}</span>}
                     </th>
                     <th className="py-3 px-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                       Telepon
                     </th>
                     <th className={thClass} onClick={() => toggleSort('email')}>
-                      Email <SortIcon colKey="email" />
+                      Email {sortKey === 'email' && <span className="inline ml-1 text-sky-500 text-xs">{sortDir === 'asc' ? '↑' : '↓'}</span>}
                     </th>
                     <th className={thClass} onClick={() => toggleSort('birthdate')}>
-                      Tgl Lahir <SortIcon colKey="birthdate" />
+                      Tgl Lahir {sortKey === 'birthdate' && <span className="inline ml-1 text-sky-500 text-xs">{sortDir === 'asc' ? '↑' : '↓'}</span>}
                     </th>
                     <th className={thClass} onClick={() => toggleSort('role')}>
-                      Jabatan <SortIcon colKey="role" />
+                      Jabatan {sortKey === 'role' && <span className="inline ml-1 text-sky-500 text-xs">{sortDir === 'asc' ? '↑' : '↓'}</span>}
                     </th>
                   </tr>
                 </thead>

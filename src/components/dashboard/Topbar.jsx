@@ -13,7 +13,7 @@ const titles = {
 export default function Topbar({ onOpenSidebar }) {
   const location = useLocation();
   const title = titles[location.pathname] || 'Dashboard';
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {

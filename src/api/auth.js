@@ -5,10 +5,11 @@ import api from './axios'
 /**
  * LOGIN EMAIL + PASSWORD
  */
-export const login = async (email, password) => {
+export const login = async (email, password, companyId) => {
   const response = await api.post('/api/login', {
     login: email,
     password,
+    company_id: companyId,
   })
 
   const token = response.data.token
@@ -28,10 +29,11 @@ export const login = async (email, password) => {
 /**
  * LOGIN OTP
  */
-export const loginWithOtp = async (phone, otp) => {
+export const loginWithOtp = async (phone, otp, companyId) => {
   const response = await api.post('/api/auth/verify-otp', {
     phone,
     otp,
+    company_id: companyId,
   })
 
   const token = response.data.token
@@ -51,9 +53,10 @@ export const loginWithOtp = async (phone, otp) => {
 /**
  * REQUEST OTP
  */
-export const requestOtp = async (phone) => {
+export const requestOtp = async (phone, companyId) => {
   const response = await api.post('/api/auth/request-otp', {
     phone,
+    company_id: companyId,
   })
 
   return response.data

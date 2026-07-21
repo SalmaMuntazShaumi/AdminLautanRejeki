@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  login as loginApi, 
-  logout as logoutApi, 
-  getUser, 
-  isAuthenticated, 
-  getStoredUser, 
-  requestOtp as requestOtpApi
+import {
+  login as loginApi,
+  logout as logoutApi,
+  getUser,
+  isAuthenticated,
+  getStoredUser,
+  requestOtp as requestOtpApi,
+  loginWithOtp as loginWithOtpApi,
 } from '../api/auth';
 
 const AuthContext = createContext(null);
@@ -37,8 +38,9 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (email, password, role) => {
-    const data = await loginApi(email, password);
+  // ✅ Tambah companyId, diteruskan ke loginApi (perlu diupdate juga di api/auth.js)
+  const login = async (email, password, companyId) => {
+    const data = await loginApi(email, password, companyId);
     const userData = data.user || data;
 
     // ✅ Cek role
@@ -54,16 +56,24 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
-  // ✅ Fix: requestOtp tidak set user, hanya kirim OTP
-  const requestOtp = async (phone) => {
-    const data = await requestOtpApi(phone);
+  // ✅ Tambah companyId
+  const requestOtp = async (phone, companyId) => {
+    const data = await requestOtpApi(phone, companyId);
     return data;
   };
 
-  // ✅ Tambah: set user setelah verify OTP berhasil
-  const loginWithOtp = async (phone, otp) => {
-    const response = await import('../api/auth').then(m => m.loginWithOtp(phone, otp));
+  // ✅ Tambah companyId, sekaligus hapus dynamic import yang gak perlu
+  const loginWithOtp = async (phone, otp, companyId) => {
+    const response = await loginWithOtpApi(phone, otp, companyId);
     const userData = response.user || response;
+
+    // Konsisten dengan login(): cek role admin juga di jalur OTP
+    if (userData.role?.toLowerCase() !== 'admin') {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      throw new Error('Akses ditolak. Hanya admin yang dapat login.');
+    }
+
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     return userData;
@@ -78,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{ user, loading, login, requestOtp, loginWithOtp, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
-  );
+  );  
 };
 
 export const useAuth = () => {

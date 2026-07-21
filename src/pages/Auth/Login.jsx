@@ -5,10 +5,20 @@ import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { useAuth } from '../../contexts/AuthContext'
 
-export default function LoginPage() {
-  const [mode, setMode] = useState('email')
+// Sesuai data yang di-seed di migration companies (slug: pusat, cabang).
+// Kalau nanti ada endpoint GET /api/companies, ganti bagian ini dengan fetch dinamis.
+const COMPANIES = [
+  { slug: 'pusat', name: 'Lautan Rejeki Pusat' },
+  { slug: 'cabang', name: 'Lautan Rejeki Cabang' },
+]
 
-  const [email, setEmail] = useState('')
+export default function LoginPage() {
+  const [mode, setMode] = useState('password') // 'password' | 'otp'
+
+  const [companyId, setCompanyId] = useState('')
+
+  // AuthController@login menerima field tunggal "login" (auto-detect email vs phone)
+  const [loginField, setLoginField] = useState('')
   const [password, setPassword] = useState('')
 
   const [phone, setPhone] = useState('')
@@ -18,50 +28,70 @@ export default function LoginPage() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  const { login, requestOtp, loginWithOtp } = useAuth() // ✅ ambil loginWithOtp
+  // AuthContext perlu diupdate supaya meneruskan companyId ke endpoint yang sesuai:
+  // - login(loginField, password, companyId)      -> POST /api/login      { login, password, company_id }
+  // - requestOtp(phone, companyId)                 -> POST /api/otp/request { phone, company_id }
+  // - verifyOtp(phone, otp, companyId)              -> POST /api/otp/verify  { phone, otp, company_id }
+  const { login, requestOtp, verifyOtp } = useAuth()
 
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from?.pathname || '/'
 
-  const handleEmailLogin = async (e) => {
+  const getErrorMessage = (err, fallback) => {
+    const errors = err.response?.data?.errors
+    const firstError = errors ? Object.values(errors)[0]?.[0] : null
+    return firstError || err.response?.data?.message || fallback
+  }
+
+  const handlePasswordLogin = async (e) => {
     e.preventDefault()
+
+    if (!companyId) {
+      setError('Silakan pilih perusahaan terlebih dahulu.')
+      return
+    }
+
     setError(null)
     setLoading(true)
     try {
-      await login(email, password)
+      await login(loginField, password, companyId)
       navigate(from, { replace: true })
     } catch (err) {
-      setError(err.response?.data?.message || 'Email atau password salah.')
+      setError(getErrorMessage(err, 'Email/nomor telepon atau password salah.'))
     } finally {
       setLoading(false)
     }
   }
 
-  // ✅ Fix: panggil loginWithPhone bukan requestOtp langsung
-  const loginWithPhone = async () => {
+  const handleRequestOtp = async () => {
+    if (!companyId) {
+      setError('Silakan pilih perusahaan terlebih dahulu.')
+      return
+    }
+
     setError(null)
     setLoading(true)
     try {
-      await requestOtp(phone)
+      await requestOtp(phone, companyId)
       setOtpSent(true)
     } catch (err) {
-      setError(err.response?.data?.message || 'Gagal mengirim OTP.')
+      setError(getErrorMessage(err, 'Gagal mengirim OTP.'))
     } finally {
       setLoading(false)
     }
   }
 
-  // ✅ Fix: pakai loginWithOtp dari context, bukan axios langsung
-  const verifyOtp = async (e) => {
+  const handleVerifyOtp = async (e) => {
     e.preventDefault()
+
     setError(null)
     setLoading(true)
     try {
-      await loginWithOtp(phone, otp)
+      await verifyOtp(phone, otp, companyId)
       navigate(from, { replace: true })
     } catch (err) {
-      setError(err.response?.data?.message || 'OTP tidak valid.')
+      setError(getErrorMessage(err, 'OTP tidak valid.'))
     } finally {
       setLoading(false)
     }
@@ -74,29 +104,48 @@ export default function LoginPage() {
         <h2 className="text-2xl font-bold mb-2">Masuk ke Lautan Rejeki</h2>
         <p className="text-sm text-slate-500 mb-6">Kelola absensi karyawan dengan mudah.</p>
 
+        <div className="mb-6">
+          <label className="text-sm font-medium">Perusahaan</label>
+          <select
+            value={companyId}
+            onChange={(e) => setCompanyId(e.target.value)}
+            required
+            className="w-full border rounded-xl px-4 py-3 mt-1"
+          >
+            <option value="" disabled>
+              Pilih Perusahaan
+            </option>
+            {COMPANIES.map((company) => (
+              <option key={company.slug} value={company.slug}>
+                {company.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex gap-2 mb-6">
           <button
-            onClick={() => { setMode('email'); setError(null) }}
-            className={`flex-1 py-2 rounded-lg border ${mode === 'email' ? 'bg-sky-500 text-white' : 'bg-white'}`}
+            onClick={() => { setMode('password'); setError(null) }}
+            className={`flex-1 py-2 rounded-lg border ${mode === 'password' ? 'bg-sky-500 text-white' : 'bg-white'}`}
           >
-            Email
+            Password
           </button>
           <button
-            onClick={() => { setMode('phone'); setError(null) }}
-            className={`flex-1 py-2 rounded-lg border ${mode === 'phone' ? 'bg-sky-500 text-white' : 'bg-white'}`}
+            onClick={() => { setMode('otp'); setError(null) }}
+            className={`flex-1 py-2 rounded-lg border ${mode === 'otp' ? 'bg-sky-500 text-white' : 'bg-white'}`}
           >
-            Nomor Telepon
+            OTP WhatsApp
           </button>
         </div>
 
         {error && <div className="text-sm text-red-600 mb-4">{error}</div>}
 
-        {mode === 'email' && (
-          <form onSubmit={handleEmailLogin} className="space-y-4">
+        {mode === 'password' && (
+          <form onSubmit={handlePasswordLogin} className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Email</label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                required placeholder="you@company.com" className="mt-1 w-full" />
+              <label className="text-sm font-medium">Email atau Nomor Telepon</label>
+              <Input type="text" value={loginField} onChange={(e) => setLoginField(e.target.value)}
+                required placeholder="you@company.com / 08xxxxxxxxxx" className="mt-1 w-full" />
             </div>
             <div>
               <label className="text-sm font-medium">Password</label>
@@ -109,28 +158,35 @@ export default function LoginPage() {
           </form>
         )}
 
-        {mode === 'phone' && (
+        {mode === 'otp' && (
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium">Nomor Telepon</label>
               <Input type="text" value={phone} onChange={(e) => setPhone(e.target.value)}
-                placeholder="08xxxxxxxxxx" className="mt-1 w-full" />
+                placeholder="08xxxxxxxxxx" className="mt-1 w-full" disabled={otpSent} />
             </div>
 
             {!otpSent ? (
-              <Button onClick={loginWithPhone} className="w-full py-3" disabled={loading}>
+              <Button onClick={handleRequestOtp} className="w-full py-3" disabled={loading}>
                 {loading ? 'Mengirim OTP...' : 'Kirim OTP'}
               </Button>
             ) : (
-              <form onSubmit={verifyOtp} className="space-y-4">
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium">OTP</label>
+                  <label className="text-sm font-medium">Kode OTP</label>
                   <Input type="text" value={otp} onChange={(e) => setOtp(e.target.value)}
-                    placeholder="Masukkan OTP" className="mt-1 w-full" />
+                    placeholder="6 digit kode OTP" maxLength={6} className="mt-1 w-full" />
                 </div>
                 <Button type="submit" className="w-full py-3" disabled={loading}>
                   {loading ? 'Memverifikasi...' : 'Verifikasi OTP'}
                 </Button>
+                <button
+                  type="button"
+                  onClick={() => { setOtpSent(false); setOtp('') }}
+                  className="text-sm text-sky-600 hover:underline w-full text-center"
+                >
+                  Ganti nomor telepon
+                </button>
               </form>
             )}
           </div>

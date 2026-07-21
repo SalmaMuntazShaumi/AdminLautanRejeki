@@ -3,7 +3,6 @@ import Dashboard from '../pages/Dashboard/dashboard';
 import LoginPage from '../pages/Auth/Login';
 import KaryawanPage from '../pages/Karyawan';
 import ReportsPage from '../pages/Reports';
-// import CalendarPage from '../pages/Calendar';
 import NotFound from '../pages/NotFound';
 import { useAuth } from '../contexts/AuthContext';
 import RegisterPage from '../pages/Auth/Register';

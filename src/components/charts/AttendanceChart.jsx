@@ -5,7 +5,6 @@ import {
   BarElement, Title, Tooltip, Legend
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import { Download } from 'lucide-react';
 import { getWeekNumber } from '../../utils/week_helper';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -28,7 +27,7 @@ export default function AttendanceChart({ data, loading, onFilterDate, onExport 
   useEffect(() => {
     if (!hasMounted.current) { hasMounted.current = true; return; }
     onFilterDate({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
-  }, [reportType, selectedDate, selectedMonth, selectedYear]);
+  }, [onFilterDate, reportType, selectedDate, selectedMonth, selectedYear, selectedWeek]);
 
   const chartData = buildChartData(data, reportType);
 
@@ -67,10 +66,6 @@ export default function AttendanceChart({ data, loading, onFilterDate, onExport 
         y: { beginAtZero: true, ticks: { stepSize: 1 } },
     },
   };
-
-  function handleExport() {
-    onExport({ reportType, selectedDate, selectedMonth, selectedYear, selectedWeek });
-  }
 
   return (
     <div className="card p-6">

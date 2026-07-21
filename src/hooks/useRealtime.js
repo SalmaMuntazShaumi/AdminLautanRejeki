@@ -55,7 +55,7 @@ export const useRealtime = (fetchFn, options = {}) => {
         setLoading(false);
       }
     }
-  }, [fetchFn, enabled, ...deps]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchFn, enabled, ...deps]);
 
   useEffect(() => {
     isMountedRef.current = true;
